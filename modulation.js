@@ -20,7 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-const updateIq = (function(){
+// 単位円を順方向に回る
+function updateIqCircle(count, lo_cycle) {
+    const radian = (count / lo_cycle / 64) * Math.PI * 2;
+    return {I:1/Math.sqrt(2) * Math.cos(radian), Q:1/Math.sqrt(2) * Math.sin(radian)};
+}
+
+const modulation_select = {
+    '単位円を順方向に回る':0,
+    'CW 5波の重ね合わせのつもり':1,
+    'CW 3波の重ね合わせのつもり':2,
+    'CW 2波の重ね合わせのつもり':3,
+    'CW 1波初期位相0度':4,
+    'CW 1波初期位相45度':5,
+    'CW 1波初期位相90度':6
+}
+
+const getUpdateIq = function(index){
     // 単位円を順方向に回る
     function updateIqCircle(count, lo_cycle) {
         const radian = (count / lo_cycle / 64) * Math.PI * 2;
@@ -61,13 +77,16 @@ const updateIq = (function(){
         return {I:0, Q:1};
     }
 
+    const updateIqs = [
+        updateIqCircle,
+        updateIq5,
+        updateIq3,
+        updateIq2,
+        updateIq1_ph0deg,
+        updateIq1_ph45deg,
+        updateIq1_ph90deg,
+    ]
+
     // 呼び出し対象関数は個々の戻り値で返す関数を変えることで実現できる。
-    return updateIqCircle;
-//    return updateIq5;
-//    return updateIq3;
-//    return updateIq2;
-//    return updateIq1;
-//    return updateIq1_ph0deg;
-//    return updateIq1_ph45deg;
-//    return updateIq1_ph90deg;
-})();
+    return updateIqs[index];
+}
